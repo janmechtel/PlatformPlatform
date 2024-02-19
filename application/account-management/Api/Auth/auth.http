@@ -1,0 +1,23 @@
+@host = https://localhost:8443
+@tenant = acme
+@email = foo@bar.dk
+@password = !mySecretPassword123
+
+### User registration of a new user and tenant
+POST {{host}}/api/auth/register
+Content-Type: application/json
+
+{
+  "email": "{{email}}",
+  "password": "{{password}}",
+}
+
+### User login
+POST {{host}}/api/auth/login
+# Cookie: X-Access-Token=mySecretAccessToken; X-Refresh-Token=123
+Content-Type: application/json
+
+{
+  "email": "{{email}}",
+  "password": "{{password}}",
+}

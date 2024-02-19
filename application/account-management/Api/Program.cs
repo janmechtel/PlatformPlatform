@@ -1,3 +1,7 @@
+using System.Security.Claims;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using PlatformPlatform.AccountManagement.Api.Auth;
 using PlatformPlatform.AccountManagement.Api.Tenants;
 using PlatformPlatform.AccountManagement.Api.Users;
 using PlatformPlatform.AccountManagement.Application;
@@ -13,7 +17,8 @@ builder.Services
     .AddApplicationServices()
     .AddDatabaseContext(builder)
     .AddInfrastructureServices()
-    .AddApiCoreServices(builder);
+    .AddApiCoreServices(builder)
+    .AddIdentityServices();
 
 var app = builder.Build();
 
@@ -21,7 +26,16 @@ var app = builder.Build();
 app.AddApiCoreConfiguration<AccountManagementDbContext>();
 app.UseWebAppMiddleware();
 
-app.MapTenantEndpoints();
 app.MapUserEndpoints();
+app.MapTenantEndpoints();
+app.MapIdentityEndpoints();
+app.MapIdentityApi<ApplicationUser>();
+
+app.UseAuthentication();
+
+app.MapGet("/api/secret", (ClaimsPrincipal user) => $"Hello {user.Identity?.Name}. My secret")
+    .RequireAuthorization();
+app.MapGet("/api/secret2", () => "This is a different secret!")
+    .RequireAuthorization(p => p.RequireClaim("scope", "myapi:secrets"));
 
 app.Run();
