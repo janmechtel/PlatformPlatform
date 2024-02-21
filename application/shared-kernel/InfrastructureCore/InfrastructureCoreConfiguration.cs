@@ -6,6 +6,7 @@ using Microsoft.Extensions.Hosting;
 using PlatformPlatform.SharedKernel.DomainCore.DomainEvents;
 using PlatformPlatform.SharedKernel.DomainCore.Persistence;
 using PlatformPlatform.SharedKernel.InfrastructureCore.Persistence;
+using PlatformPlatform.SharedKernel.InfrastructureCore.Services;
 
 namespace PlatformPlatform.SharedKernel.InfrastructureCore;
 
@@ -36,6 +37,8 @@ public static class InfrastructureCoreConfiguration
             new DomainEventCollector(provider.GetRequiredService<T>()));
 
         services.RegisterRepositories(assembly);
+
+        services.AddTransient<SmtpEmailSender>();
 
         return services;
     }

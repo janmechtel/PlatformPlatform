@@ -1,55 +1,35 @@
-using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Identity;
+using PlatformPlatform.AccountManagement.Infrastructure;
+using IdentityUser = PlatformPlatform.AccountManagement.Infrastructure.Identity.IdentityUser;
 
 namespace PlatformPlatform.AccountManagement.Api.Auth;
 
-// CookieExtensions
 public static class JwtCookieAuthenticationExtensions
 {
-    /// <summary>
-    ///     JWT Cookie Authentication using a HTTP cookie persisted in the client to perform authentication.
-    /// </summary>
-    /// <param name="builder"></param>
-    /// <returns></returns>
-    public static AuthenticationBuilder AddJwtCookieAuthentication(this AuthenticationBuilder builder)
+    [UsedImplicitly]
+    public static IServiceCollection AddJwtCookieAuthentication(this IServiceCollection services)
     {
-        return builder.AddJwtCookieAuthentication(null!);
-    }
+        services.Configure<IdentityOptions>(options => options.User.RequireUniqueEmail = false);
 
-    /// <summary>
-    ///     JWT Cookie Authentication using a HTTP cookie persisted in the client to perform authentication.
-    /// </summary>
-    /// <param name="builder"></param>
-    /// <param name="configureOptions"></param>
-    /// <returns></returns>
-    public static AuthenticationBuilder AddJwtCookieAuthentication(
-        this AuthenticationBuilder builder,
-        Action<JwtCookieAuthAuthenticationOptions> configureOptions
-    )
-    {
-        return builder.AddJwtCookieAuthentication(null, configureOptions);
-    }
+        services.AddAuthentication(options =>
+            {
+                options.DefaultScheme = JwtCookieAuthenticationSchemeOptions.AuthenticationScheme;
+                options.DefaultAuthenticateScheme = JwtCookieAuthenticationSchemeOptions.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtCookieAuthenticationSchemeOptions.AuthenticationScheme;
+                options.DefaultSignInScheme = JwtCookieAuthenticationSchemeOptions.AuthenticationScheme;
+            })
+            .AddScheme<JwtCookieAuthenticationSchemeOptions, JwtCookieAuthenticationHandler>(
+                JwtCookieAuthenticationSchemeOptions.AuthenticationScheme, null);
 
-    /// <summary>
-    ///     JWT Cookie Authentication using a HTTP cookie persisted in the client to perform authentication.
-    /// </summary>
-    /// <param name="builder"></param>
-    /// <param name="displayName"></param>
-    /// <param name="configureOptions"></param>
-    /// <returns></returns>
-    public static AuthenticationBuilder AddJwtCookieAuthentication(
-        this AuthenticationBuilder builder,
-        string? displayName,
-        Action<JwtCookieAuthAuthenticationOptions> configureOptions
-    )
-    {
-//        builder.Services.TryAddEnumerable(ServiceDescriptor.Singleton<IPostConfigureOptions<CookieAuthenticationOptions>, PostConfigureCookieAuthenticationOptions>());
-//        builder.Services.AddOptions<CookieAuthenticationOptions>(authenticationScheme).Validate(o => o.Cookie.Expiration == null, "Cookie.Expiration is ignored, use ExpireTimeSpan instead.");
-//        return builder.AddScheme<CookieAuthenticationOptions, CookieAuthenticationHandler>(authenticationScheme, displayName, configureOptions);
+        services.AddAuthorization();
 
-        builder.Services.AddOptions<JwtCookieAuthAuthenticationOptions>(
-            JwtCookieAuthAuthenticationOptions.DefaultScheme);
-        return builder.AddScheme<JwtCookieAuthAuthenticationOptions, JwtCookieAuthenticationHandler>(
-            JwtCookieAuthAuthenticationOptions.DefaultScheme, displayName,
-            configureOptions);
+        services
+            .AddIdentityApiEndpoints<IdentityUser>(options => { options.SignIn.RequireConfirmedAccount = true; })
+            // .AddRoles<IdentityRole>()
+            .AddEntityFrameworkStores<AccountManagementDbContext>();
+
+        services.AddSingleton<IEmailSender<IdentityUser>, IdentityEmailTestSender>();
+
+        return services;
     }
 }

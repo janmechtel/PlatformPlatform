@@ -1,11 +1,10 @@
 using System.Security.Claims;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
 using PlatformPlatform.AccountManagement.Api.Auth;
 using PlatformPlatform.AccountManagement.Api.Tenants;
 using PlatformPlatform.AccountManagement.Api.Users;
 using PlatformPlatform.AccountManagement.Application;
 using PlatformPlatform.AccountManagement.Infrastructure;
+using PlatformPlatform.AccountManagement.Infrastructure.Identity;
 using PlatformPlatform.SharedKernel.ApiCore;
 using PlatformPlatform.SharedKernel.ApiCore.Middleware;
 
@@ -17,10 +16,13 @@ builder.Services
     .AddApplicationServices()
     .AddDatabaseContext(builder)
     .AddInfrastructureServices()
-    .AddApiCoreServices(builder)
-    .AddIdentityServices();
+    .AddJwtCookieAuthentication()
+    .AddApiCoreServices(builder);
 
 var app = builder.Build();
+
+app.UseAuthentication();
+app.UseAuthorization();
 
 // Add common configuration for all APIs like Swagger, HSTS, DeveloperExceptionPage, and run EF database migrations.
 app.AddApiCoreConfiguration<AccountManagementDbContext>();
@@ -28,10 +30,9 @@ app.UseWebAppMiddleware();
 
 app.MapUserEndpoints();
 app.MapTenantEndpoints();
-app.MapIdentityEndpoints();
-app.MapIdentityApi<ApplicationUser>();
-
-app.UseAuthentication();
+app.MapRegistrationEndpoints();
+app.MapAuthenticationEndpoints();
+app.MapPasswordEndpoints();
 
 app.MapGet("/api/secret", (ClaimsPrincipal user) => $"Hello {user.Identity?.Name}. My secret")
     .RequireAuthorization();

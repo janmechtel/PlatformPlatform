@@ -1,5 +1,5 @@
 @host = https://localhost:8443
-@tenant = acme
+@tenantId = acme
 @email = foo@bar.dk
 @password = !mySecretPassword123
 
@@ -8,8 +8,9 @@ POST {{host}}/api/auth/register
 Content-Type: application/json
 
 {
+  "tenantId": "{{tenantId}}",
   "email": "{{email}}",
-  "password": "{{password}}",
+  "password": "{{password}}"
 }
 
 ### User login
@@ -19,5 +20,8 @@ Content-Type: application/json
 
 {
   "email": "{{email}}",
-  "password": "{{password}}",
+  "password": "{{password}}"
 }
+
+### Get Secret
+GET {{host}}/api/secret

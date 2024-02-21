@@ -19,7 +19,7 @@ public sealed class WebAppMiddleware
     public const string PublicUrlKey = "PUBLIC_URL";
     public const string CdnUrlKey = "CDN_URL";
     private const string Locale = "LOCALE";
-    private const string UserName = "USER_NAME";
+    private const string UserEmail = "USER_EMAIL";
     private const string UserRole = "USER_ROLE";
     private const string IsUserAuthenticated = "IS_USER_AUTHENTICATED";
     public const string ApplicationVersion = "APPLICATION_VERSION";
@@ -91,7 +91,7 @@ public sealed class WebAppMiddleware
     {
         if (context.Request.Path.ToString().StartsWith("/api/")) return _next(context);
 
-        var userName = context.User.Identity?.Name ?? "Anonymous";
+        var email = context.User.Identity?.Name ?? "Anonymous";
         var isUserAuthenticated = context.User.Identity?.IsAuthenticated ?? false;
         var role = context.User.FindFirst(ClaimTypes.Role)?.Value;
         var cultureFeature = context.Features.Get<IRequestCultureFeature>();
@@ -100,7 +100,7 @@ public sealed class WebAppMiddleware
         var requestEnvironmentVariables = new Dictionary<string, string>
         {
             { Locale, userCulture?.Name ?? "en-US" },
-            { UserName, userName },
+            { UserEmail, email },
             { IsUserAuthenticated, isUserAuthenticated.ToString() },
             { UserRole, role ?? "Member" }
         };
