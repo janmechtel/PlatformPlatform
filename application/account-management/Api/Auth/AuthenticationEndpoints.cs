@@ -1,5 +1,6 @@
 using System.Web;
 using Microsoft.AspNetCore.Identity;
+using PlatformPlatform.AccountManagement.Api.Auth.JwtCookieAuthentication;
 using IdentityUser = PlatformPlatform.AccountManagement.Infrastructure.Identity.IdentityUser;
 
 namespace PlatformPlatform.AccountManagement.Api.Auth;
@@ -73,13 +74,14 @@ public static class AuthenticationEndpoints
 
         group.MapPost("/login", async (LoginCommand command, SignInManager<IdentityUser> signInManager) =>
         {
-            signInManager.AuthenticationScheme = JwtCookieAuthenticationSchemeOptions.AuthenticationScheme;
+            signInManager.AuthenticationScheme = JwtCookieAuthenticationOptions.DefaultScheme;
             var result = await signInManager.PasswordSignInAsync(command.Email, command.Password, false, true);
             return result.Succeeded ? Results.Ok() : Results.Unauthorized();
         });
 
         group.MapPost("/logout", async (SignInManager<IdentityUser> signInManager) =>
         {
+            signInManager.AuthenticationScheme = JwtCookieAuthenticationOptions.DefaultScheme;
             await signInManager.SignOutAsync();
             return Results.Ok();
         });

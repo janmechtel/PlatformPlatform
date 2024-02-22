@@ -4,7 +4,6 @@ using PlatformPlatform.AccountManagement.Api.Tenants;
 using PlatformPlatform.AccountManagement.Api.Users;
 using PlatformPlatform.AccountManagement.Application;
 using PlatformPlatform.AccountManagement.Infrastructure;
-using PlatformPlatform.AccountManagement.Infrastructure.Identity;
 using PlatformPlatform.SharedKernel.ApiCore;
 using PlatformPlatform.SharedKernel.ApiCore.Middleware;
 
@@ -16,7 +15,7 @@ builder.Services
     .AddApplicationServices()
     .AddDatabaseContext(builder)
     .AddInfrastructureServices()
-    .AddJwtCookieAuthentication()
+    .AddAuthenticationServices()
     .AddApiCoreServices(builder);
 
 var app = builder.Build();
@@ -34,9 +33,11 @@ app.MapRegistrationEndpoints();
 app.MapAuthenticationEndpoints();
 app.MapPasswordEndpoints();
 
-app.MapGet("/api/secret", (ClaimsPrincipal user) => $"Hello {user.Identity?.Name}. My secret")
+app.MapGet("/api/secret", (ClaimsPrincipal user) => $"Hello {user.Identity?.Name} Role: {user.FindFirst(ClaimTypes.Role)}. My secret")
     .RequireAuthorization();
-app.MapGet("/api/secret2", () => "This is a different secret!")
-    .RequireAuthorization(p => p.RequireClaim("scope", "myapi:secrets"));
+app.MapGet("/api/secretOwner", () => "Hello Owner. My secret")
+    .RequireAuthorization("RequireOwnerRole");
+app.MapGet("/api/secretMember", () => "Hello Member. My secret")
+    .RequireAuthorization("RequireMemberRole");
 
 app.Run();

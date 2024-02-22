@@ -25,3 +25,12 @@ Content-Type: application/json
 
 ### Get Secret
 GET {{host}}/api/secret
+
+### Get Secret Role Owner
+GET {{host}}/api/secretOwner
+
+### Get Secret Role Member
+GET {{host}}/api/secretMember
+
+### Logout
+POST {{host}}/api/auth/logout
