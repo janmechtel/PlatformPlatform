@@ -1,5 +1,5 @@
 using System.Security.Claims;
-using System.Security.Cryptography;
+using System.Text;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
 using PlatformPlatform.AccountManagement.Api.Auth.JwtCookieAuthentication;
@@ -10,11 +10,13 @@ namespace PlatformPlatform.AccountManagement.Api.Auth;
 
 public static class AuthenticationServicesExtensions
 {
-    private static readonly SymmetricSecurityKey SecurityKey = new(RandomNumberGenerator.GetBytes(32));
-
     [UsedImplicitly]
     public static IServiceCollection AddAuthenticationServices(this IServiceCollection services)
     {
+        var jwtSecretKey = Environment.GetEnvironmentVariable("JWT_SECRET_KEY") ??
+                           throw new InvalidOperationException("JWT_SECRET_KEY environment variable is not set.");
+        var jwtSecurityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSecretKey));
+
         services.Configure<IdentityOptions>(options => options.User.RequireUniqueEmail = false);
 
         services
@@ -29,14 +31,14 @@ public static class AuthenticationServicesExtensions
             })
             .AddJwtCookieAuthentication(options =>
             {
-                options.SigningSecurityKey = SecurityKey;
+                options.SigningSecurityKey = jwtSecurityKey;
                 options.TokenValidationParameters = new TokenValidationParameters
                 {
                     ValidIssuer = "localhost",
                     ValidAudience = "localhost",
                     IssuerSigningKeys = new[]
                     {
-                        SecurityKey
+                        jwtSecurityKey
                     }
                 };
 

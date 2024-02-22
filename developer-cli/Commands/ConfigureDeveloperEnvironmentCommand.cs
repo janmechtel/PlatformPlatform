@@ -17,7 +17,7 @@ public class ConfigureDeveloperEnvironmentCommand : Command
 
     public ConfigureDeveloperEnvironmentCommand() : base(
         CommandName,
-        "Generate CERTIFICATE_PASSWORD and SQL_SERVER_PASSWORD, create developer certificate for localhost with known password, and store passwords in environment variables"
+        "Generate CERTIFICATE_PASSWORD, SQL_SERVER_PASSWORD and JWT_SECRET_KEY, create developer certificate for localhost with known password, and store passwords in environment variables"
     )
     {
         Handler = CommandHandler.Create(Execute);
@@ -27,8 +27,9 @@ public class ConfigureDeveloperEnvironmentCommand : Command
     {
         var certificateCreated = EnsureValidCertificateForLocalhostWithKnownPasswordIsConfigured();
         var sqlServerPasswordCreated = CreateSqlServerPasswordIfNotExists();
+        var jwtSecretCreated = CreateJwtSecretIfNotExists();
 
-        if (certificateCreated || sqlServerPasswordCreated)
+        if (certificateCreated || sqlServerPasswordCreated || jwtSecretCreated)
         {
             AnsiConsole.MarkupLine("[green]Please restart your terminal.[/]");
         }
@@ -53,6 +54,22 @@ public class ConfigureDeveloperEnvironmentCommand : Command
         certificatePassword = GenerateRandomPassword(16);
         AddEnvironmentVariable("SQL_SERVER_PASSWORD", certificatePassword);
         AnsiConsole.MarkupLine("[green]SQL_SERVER_PASSWORD environment variable created.[/]");
+        return true;
+    }
+
+    private bool CreateJwtSecretIfNotExists()
+    {
+        var jwtSecret = Environment.GetEnvironmentVariable("JWT_SECRET_KEY");
+
+        if (jwtSecret is not null)
+        {
+            AnsiConsole.MarkupLine("[green]JWT_SECRET_KEY environment variable already exist.[/]");
+            return false;
+        }
+
+        jwtSecret = GenerateRandomPassword(32);
+        AddEnvironmentVariable("JWT_SECRET_KEY", jwtSecret);
+        AnsiConsole.MarkupLine("[green]JWT_SECRET_KEY environment variable created.[/]");
         return true;
     }
 

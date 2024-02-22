@@ -65,7 +65,7 @@ public class InstallCommand : Command
         }
 
         if (AnsiConsole.Confirm(
-                "PlatformPlatform requires a self-signed certificate and a SQL Server password. Do you want to create them now?"))
+                "PlatformPlatform requires a self-signed certificate, SQL Server password and a JWT signing key. Do you want to create them now?"))
         {
             AnsiConsole.WriteLine();
             var command = new ConfigureDeveloperEnvironmentCommand();
