@@ -3,7 +3,7 @@ import fs from "node:fs";
 import { join, resolve } from "node:path";
 import process from "node:process";
 import type { Configuration } from "@rspack/core";
-import { DefinePlugin, HtmlRspackPlugin } from "@rspack/core";
+import { CopyRspackPlugin, DefinePlugin, HtmlRspackPlugin } from "@rspack/core";
 import { ClientFilesystemRouterPlugin } from "@platformplatform/client-filesystem-router/rspack-plugin";
 
 const buildEnv: BuildEnv = {};
@@ -112,6 +112,17 @@ const configuration: Configuration = {
       },
       publicPath: "%CDN_URL%",
     }),
+    new CopyRspackPlugin({
+      patterns: [
+        {
+          from: "public",
+          to: outputPath,
+          globOptions: {
+            ignore: ["**/index.html"],
+          },
+        },
+      ],
+    }),
     new DefinePlugin({
       "import.meta.build_env": JSON.stringify(buildEnv),
       "import.meta.runtime_env": "getApplicationEnvironment().runtimeEnv",
@@ -137,7 +148,7 @@ const configuration: Configuration = {
     devMiddleware: {
       writeToDisk: (filename) => {
         // Write index.html to disk so that the Api can serve it
-        return /index.html$/.test(filename);
+        return /index.html$/.test(filename) || /robots.txt$/.test(filename);
       },
     },
   },
