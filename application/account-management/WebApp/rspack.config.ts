@@ -102,6 +102,10 @@ const configuration: Configuration = {
         ],
         type: "css",
       },
+      {
+        test: /\.(png|jpg|ico|webp|webm)$/i,
+        type: "asset",
+      },
     ],
   },
   plugins: [
@@ -148,7 +152,7 @@ const configuration: Configuration = {
     devMiddleware: {
       writeToDisk: (filename) => {
         // Write index.html to disk so that the Api can serve it
-        return /index.html$/.test(filename) || /robots.txt$/.test(filename);
+        return /index.html$/.test(filename) || /robots.txt$/.test(filename) || /favicon.ico$/.test(filename);
       },
     },
   },
