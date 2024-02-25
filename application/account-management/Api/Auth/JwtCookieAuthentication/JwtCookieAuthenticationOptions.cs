@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.DataProtection;
 using Microsoft.IdentityModel.Tokens;
 
 namespace PlatformPlatform.AccountManagement.Api.Auth.JwtCookieAuthentication;

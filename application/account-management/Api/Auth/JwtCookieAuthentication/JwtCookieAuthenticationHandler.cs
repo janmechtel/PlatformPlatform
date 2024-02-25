@@ -39,18 +39,17 @@ public class JwtCookieAuthenticationHandler(
         }
 
         var tokenHandler = new JwtSecurityTokenHandler();
-        ClaimsPrincipal? user;
 
         try
         {
             var tokenValidationParameters = Options.TokenValidationParameters.Clone();
-            
+
             var tokenValidationResult =
                 await tokenHandler.ValidateTokenAsync(accessToken, tokenValidationParameters);
 
             if (tokenValidationResult.IsValid)
             {
-                user = new ClaimsPrincipal(tokenValidationResult.ClaimsIdentity);
+                var user = new ClaimsPrincipal(tokenValidationResult.ClaimsIdentity);
                 return AuthenticateResult.Success(new AuthenticationTicket(user, Scheme.Name));
             }
         }
@@ -75,7 +74,7 @@ public class JwtCookieAuthenticationHandler(
 
             return AuthenticateResults.FailedExpiredAccessToken(refreshTokenTicket.Properties);
         }
-        
+
         return AuthenticateResults.FailedInvalidAccessToken;
     }
 
@@ -90,10 +89,10 @@ public class JwtCookieAuthenticationHandler(
         var refreshTokenTicket = CreateRefreshTicket(user, utcNow, properties);
         var refreshToken = Options.RefreshTokenProtector.Protect(refreshTokenTicket, GetTlsTokenBinding());
 
-        var cookieOptions = BuildCookieOptions();
+        var securityCookieOptions = BuildCookieOptions();
+        Response.Cookies.Append(Options.AccessTokenName, accessToken, securityCookieOptions);
+        Response.Cookies.Append(Options.RefreshTokenName, refreshToken, securityCookieOptions);
 
-        Response.Cookies.Append(Options.AccessTokenName, accessToken, cookieOptions);
-        Response.Cookies.Append(Options.RefreshTokenName, refreshToken, cookieOptions);
         return Task.CompletedTask;
     }
 
