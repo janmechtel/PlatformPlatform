@@ -14,6 +14,10 @@ msgstr ""
 "Plural-Forms: \n"
 
 #. js-lingui-explicit-id
+msgid "Server error: Failed logout."
+msgstr "Server error: Failed logout."
+
+#. js-lingui-explicit-id
 msgid "Missing Fields. Failed to Create Account."
 msgstr "Missing Fields. Failed to Create Account."
 
@@ -33,26 +37,89 @@ msgstr "name"
 msgid "email"
 msgstr "email"
 
-msgid "Account Management"
-msgstr "Account Management"
+#. js-lingui-explicit-id
+msgid "Missing Fields. Failed to login."
+msgstr "Missing Fields. Failed to login."
+
+#. js-lingui-explicit-id
+msgid "Server error: Failed login."
+msgstr "Server error: Failed login."
+
+#. js-lingui-explicit-id
+msgid "Missing Fields. Failed to register."
+msgstr "Missing Fields. Failed to register."
+
+#. js-lingui-explicit-id
+msgid "Server error: Failed register."
+msgstr "Server error: Failed register."
+
+#. js-lingui-explicit-id
+msgid "name@work.email.com"
+msgstr "name@work.email.com"
+
+#. js-lingui-explicit-id
+msgid "Enter password"
+msgstr "Enter password"
+
+#. js-lingui-explicit-id
+msgid "Enter your first name"
+msgstr "Enter your first name"
+
+#. js-lingui-explicit-id
+msgid "Enter your last name"
+msgstr "Enter your last name"
+
+#. js-lingui-explicit-id
+#~ msgid "password"
+#~ msgstr "password"
+
+#~ msgid "Account Management"
+#~ msgstr "Account Management"
+
+msgid "Already have an account?"
+msgstr "Already have an account?"
 
 msgid "Create a account"
 msgstr "Create a account"
 
-msgid "Create Account"
-msgstr "Create Account"
+#~ msgid "Create Account"
+#~ msgstr "Create Account"
 
 msgid "Create account!"
 msgstr "Create account!"
 
+msgid "Create your account"
+msgstr "Create your account"
+
+msgid "Don't have an account?"
+msgstr "Don't have an account?"
+
 msgid "Email"
 msgstr "Email"
+
+msgid "First name"
+msgstr "First name"
+
+msgid "Last name"
+msgstr "Last name"
 
 msgid "Name"
 msgstr "Name"
 
-msgid "Overview"
-msgstr "Overview"
+#~ msgid "Overview"
+#~ msgstr "Overview"
+
+msgid "Password"
+msgstr "Password"
+
+msgid "Sign in"
+msgstr "Sign in"
+
+#~ msgid "Sign into Account"
+#~ msgstr "Sign into Account"
+
+msgid "Sign up"
+msgstr "Sign up"
 
 msgid "Something went wrong, please try again"
 msgstr "Something went wrong, please try again"
@@ -60,5 +127,5 @@ msgstr "Something went wrong, please try again"
 msgid "Subdomain"
 msgstr "Subdomain"
 
-msgid "User Management"
-msgstr "User Management"
+#~ msgid "User Management"
+#~ msgstr "User Management"
