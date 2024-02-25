@@ -1,5 +1,7 @@
+using System.Security.Claims;
 using System.Web;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Localization;
 using PlatformPlatform.AccountManagement.Api.Auth.JwtCookieAuthentication;
 using IdentityUser = PlatformPlatform.AccountManagement.Infrastructure.Identity.IdentityUser;
 
@@ -126,6 +128,30 @@ public static class AuthenticationEndpoints
         });
     }
 
+    public static void MapUserInfoEndpoints(this IEndpointRouteBuilder routes)
+    {
+        var group = routes.MapGroup(RoutesPrefix);
+
+        group.MapGet("/user-info", async (
+            HttpContext context,
+            ClaimsPrincipal claimsPrincipal,
+            UserManager<IdentityUser> userManager
+        ) =>
+        {
+            var user = await userManager.FindByEmailAsync(claimsPrincipal.Claims.First(c => c.Type == ClaimTypes.Email).Value);
+
+            if (user is null)
+            {
+                return Results.Unauthorized();
+            }
+
+            var cultureFeature = context.Features.Get<IRequestCultureFeature>();
+            var locale = cultureFeature?.RequestCulture.Culture.Name ?? "en-US";
+            
+            return Results.Json(new UserInfoResponseDto(user.UserName, user.Email, user.TenantId, user.UserRole, locale));
+        }).RequireAuthorization();
+    }
+
     private static async Task SendConfirmationEmail(
         IdentityUser user,
         HttpRequest request,
@@ -157,6 +183,9 @@ public static class AuthenticationEndpoints
         await emailSender.SendPasswordResetCodeAsync(user, user.Email!, passwordResetToken);
     }
 }
+
+[UsedImplicitly]
+public record UserInfoResponseDto(string? UserName, string? Email, TenantId? TenantId, UserRole UserRole, string Locale);
 
 [UsedImplicitly]
 public record RegisterCommand(string TenantId, string Email, string Password);

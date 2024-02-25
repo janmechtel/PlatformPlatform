@@ -21,6 +21,8 @@ public sealed class WebAppMiddleware
     private const string Locale = "LOCALE";
     private const string UserEmail = "USER_EMAIL";
     private const string UserRole = "USER_ROLE";
+    private const string UserName = "USER_NAME";
+    private const string TenantId = "TENANT_ID";
     private const string IsUserAuthenticated = "IS_USER_AUTHENTICATED";
     public const string ApplicationVersion = "APPLICATION_VERSION";
 
@@ -31,12 +33,12 @@ public sealed class WebAppMiddleware
     private readonly RequestDelegate _next;
     private readonly string[] _publicAllowedKeys = [CdnUrlKey, ApplicationVersion];
     private readonly string _publicUrl;
-    private readonly Dictionary<string, string> _staticRuntimeEnvironment;
+    private readonly Dictionary<string, string?> _staticRuntimeEnvironment;
     private string? _htmlTemplate;
 
     public WebAppMiddleware(
         RequestDelegate next,
-        Dictionary<string, string> staticRuntimeEnvironment,
+        Dictionary<string, string?> staticRuntimeEnvironment,
         string htmlTemplatePath,
         IOptions<JsonOptions> jsonOptions
     )
@@ -53,7 +55,7 @@ public sealed class WebAppMiddleware
         _publicUrl = staticRuntimeEnvironment.GetValueOrDefault(PublicUrlKey)!;
     }
 
-    private void VerifyRuntimeEnvironment(Dictionary<string, string> environmentVariables)
+    private void VerifyRuntimeEnvironment(Dictionary<string, string?> environmentVariables)
     {
         foreach (var key in environmentVariables.Keys)
         {
@@ -93,20 +95,31 @@ public sealed class WebAppMiddleware
     {
         if (context.Request.Path.ToString().StartsWith("/api/")) return _next(context);
 
-        var email = context.User.Identity?.Name ?? "Anonymous";
+        var userName = context.User.FindFirst(ClaimTypes.Name)?.Value;
+        var userEmail = context.User.Identity?.Name;
         var isUserAuthenticated = context.User.Identity?.IsAuthenticated ?? false;
-        var role = context.User.FindFirst(ClaimTypes.Role)?.Value;
+        var userRole = context.User.FindFirst(ClaimTypes.Role)?.Value;
         var cultureFeature = context.Features.Get<IRequestCultureFeature>();
         var userCulture = cultureFeature?.RequestCulture.Culture;
+        var tenantId = context.User.FindFirst("tenantId")?.Value;
 
-        var requestEnvironmentVariables = new Dictionary<string, string>
-        {
+          
+        var requestEnvironmentVariables = new Dictionary<string, string?>() {
+            { IsUserAuthenticated, isUserAuthenticated ? "true" : "false" },
             { Locale, userCulture?.Name ?? "en-US" },
-            { UserEmail, email },
-            { IsUserAuthenticated, isUserAuthenticated.ToString() },
-            { UserRole, role ?? "Member" }
         };
 
+        if (isUserAuthenticated)
+        {
+            requestEnvironmentVariables = requestEnvironmentVariables.Concat(new Dictionary<string, string?>
+            {
+                { UserName, userName },
+                { UserEmail, userEmail },
+                { UserRole, userRole },
+                { TenantId, tenantId }
+            }).ToDictionary();
+        }
+        
         // Cache control
         ApplyNoCacheHeaders(context);
         // Security headers
@@ -117,7 +130,7 @@ public sealed class WebAppMiddleware
         return context.Response.WriteAsync(GetHtmlWithEnvironment(requestEnvironmentVariables));
     }
 
-    private string GetHtmlWithEnvironment(Dictionary<string, string>? requestEnvironmentVariables = null)
+    private string GetHtmlWithEnvironment(Dictionary<string, string?>? requestEnvironmentVariables = null)
     {
         if (_htmlTemplate is null || _isDevelopment)
         {

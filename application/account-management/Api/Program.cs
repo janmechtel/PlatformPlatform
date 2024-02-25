@@ -32,6 +32,7 @@ app.MapTenantEndpoints();
 app.MapRegistrationEndpoints();
 app.MapAuthenticationEndpoints();
 app.MapPasswordEndpoints();
+app.MapUserInfoEndpoints();
 
 app.MapGet("/api/secret", (ClaimsPrincipal user) => $"Hello {user.Identity?.Name} Role: {user.FindFirst(ClaimTypes.Role)}. My secret")
     .RequireAuthorization();
