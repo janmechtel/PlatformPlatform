@@ -53,7 +53,6 @@ export function SignUpForm() {
               type="text"
               name="lastName"
               autoComplete="family-name"
-              autoFocus
               required
               placeholder={i18n.t("Enter your last name")}
             />
@@ -67,14 +66,13 @@ export function SignUpForm() {
               type="email"
               name="email"
               autoComplete="email webauthn"
-              autoFocus
               required
               placeholder={i18n.t("name@work.email.com")}
             />
             <FieldError />
           </TextField>
 
-          <TextField type="password" name="password" autoFocus className="flex flex-col" isRequired>
+          <TextField type="password" name="password" className="flex flex-col" isRequired>
             <Label>
               <Trans>Password</Trans>
             </Label>

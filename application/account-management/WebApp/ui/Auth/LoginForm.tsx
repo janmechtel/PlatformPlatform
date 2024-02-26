@@ -47,7 +47,7 @@ export default function LoginForm() {
             <FieldError />
           </TextField>
 
-          <TextField type="password" name="password" autoFocus className="flex flex-col">
+          <TextField type="password" name="password" className="flex flex-col">
             <Label>
               <Trans>Password</Trans>
             </Label>
