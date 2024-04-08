@@ -85,10 +85,16 @@ msgstr ""
 msgid "Password"
 msgstr ""
 
+msgid "PlatformPlatform domain"
+msgstr ""
+
 msgid "Please check your email for a verification code sent to <0>{email}</0>"
 msgstr ""
 
 msgid "Please sign in to continue"
+msgstr ""
+
+msgid "Region"
 msgstr ""
 
 msgid "Sign in"
@@ -103,8 +109,8 @@ msgstr ""
 msgid "Something went wrong, please try again"
 msgstr ""
 
-msgid "Subdomain"
-msgstr ""
+#~ msgid "Subdomain"
+#~ msgstr ""
 
 msgid "This is the example for the<0>Acme</0>demo product, brought to you by PlatformPlatform"
 msgstr ""

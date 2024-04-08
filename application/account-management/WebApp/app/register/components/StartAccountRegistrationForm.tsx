@@ -11,6 +11,8 @@ import { Link } from "@/ui/components/Link";
 import { FieldError, Input, Label } from "@/ui/components/Field";
 import poweredByUrl from "@/ui/images/powered-by.png";
 import logoMarkUrl from "@/ui/images/logo-mark.png";
+import { DomainInput } from "@/ui/DomainInput";
+import { Select, SelectItem } from "@/ui/components/Select";
 
 export function StartAccountRegistrationForm() {
   const { i18n } = useLingui();
@@ -47,16 +49,32 @@ export function StartAccountRegistrationForm() {
           </TextField>
           <TextField className="flex flex-col">
             <Label>
-              <Trans>Subdomain</Trans>
+              <Trans>PlatformPlatform domain</Trans>
             </Label>
-            <Input
+            <DomainInput
               type="text"
               name="subdomain"
+              domain=".platformplatform.com"
               required
               placeholder={i18n.t("subdomain")}
             />
             <FieldError />
           </TextField>
+          <TextField className="flex flex-col">
+            <Label>
+              <Trans>Region</Trans>
+            </Label>
+            <Select
+              name="region"
+              selectedKey="europe"
+              isDisabled
+              key="europe"
+            >
+              <SelectItem id="europe">Europe</SelectItem>
+            </Select>
+            <FieldError />
+          </TextField>
+
         </div>
         <StartAccountRegistrationButton />
         <div className="flex flex-col text-neutral-500 items-center gap-6">

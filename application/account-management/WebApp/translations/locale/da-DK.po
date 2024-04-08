@@ -85,11 +85,17 @@ msgstr "Indtast din verifikationskode"
 msgid "Password"
 msgstr "Adgangskode"
 
+msgid "PlatformPlatform domain"
+msgstr ""
+
 msgid "Please check your email for a verification code sent to <0>{email}</0>"
 msgstr "Tjek venligst din e-mail for en verifikationskode sendt til <0>{email}</0>"
 
 msgid "Please sign in to continue"
 msgstr "Log ind for at fortsætte"
+
+msgid "Region"
+msgstr ""
 
 msgid "Sign in"
 msgstr "Log ind"
@@ -103,8 +109,8 @@ msgstr "Opret"
 msgid "Something went wrong, please try again"
 msgstr "Noget gik galt, prøv igen"
 
-msgid "Subdomain"
-msgstr "Subdomæne"
+#~ msgid "Subdomain"
+#~ msgstr "Subdomæne"
 
 msgid "This is the example for the<0>Acme</0>demo product, brought to you by PlatformPlatform"
 msgstr "Dette er et eksempel på<0>Acme</0>demo produkt, præsenteret af PlatformPlatform"
