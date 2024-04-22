@@ -9,6 +9,9 @@ namespace PlatformPlatform.SharedKernel.ApiCore.Middleware;
 
 public class WebAppMiddlewareConfiguration
 {
+    private readonly bool _isDevelopment;
+    private readonly string HtmlTemplatePath = GetHtmlTemplatePath();
+    private string? _htmlTemplate;
     public const string PublicUrlKey = "PUBLIC_URL";
     public const string CdnUrlKey = "CDN_URL";
     private const string PublicKeyPrefix = "PUBLIC_";
@@ -17,6 +20,7 @@ public class WebAppMiddlewareConfiguration
     
     public WebAppMiddlewareConfiguration(IOptions<JsonOptions> jsonOptions, bool isDevelopment)
     {
+        _isDevelopment = isDevelopment;
         // Environment variables are empty when generating EF Core migrations
         PublicUrl = Environment.GetEnvironmentVariable(PublicUrlKey) ?? string.Empty;
         CdnUrl = Environment.GetEnvironmentVariable(CdnUrlKey) ?? string.Empty;
@@ -35,8 +39,6 @@ public class WebAppMiddlewareConfiguration
         VerifyRuntimeEnvironment(StaticRuntimeEnvironment);
         
         BuildRootPath = GetWebAppDistRoot("WebApp", "dist");
-        HtmlTemplate = ReadHtmlTemplate(GetHtmlTemplatePath(), isDevelopment);
-        
         PermissionPolicies = GetPermissionsPolicies();
         ContentSecurityPolicies = GetContentSecurityPolicies(isDevelopment);
     }
@@ -47,7 +49,21 @@ public class WebAppMiddlewareConfiguration
     
     public string BuildRootPath { get; }
     
-    public string HtmlTemplate { get; }
+    public string GetHtmlTemplate()
+    {
+        if(_htmlTemplate is not null)
+        {
+            return _htmlTemplate;
+        }
+        
+        if (!File.Exists(HtmlTemplatePath))
+        {
+            throw new FileNotFoundException("index.html does not exist.", HtmlTemplatePath);
+        }
+        
+        _htmlTemplate = File.ReadAllText(HtmlTemplatePath, new UTF8Encoding());
+        return _htmlTemplate;
+    }
     
     public Dictionary<string, string> StaticRuntimeEnvironment { get; }
     
@@ -76,26 +92,17 @@ public class WebAppMiddlewareConfiguration
     public static string GetHtmlTemplatePath()
     {
         var buildRootPath = GetWebAppDistRoot("WebApp", "dist");
-        return Path.Combine(buildRootPath, "index.html");
-    }
-    
-    private string ReadHtmlTemplate(string htmlTemplatePath, bool isDevelopment)
-    {
-        if (isDevelopment)
-        {
-            for (var i = 0; i < 10; i++)
-            {
-                if (File.Exists(htmlTemplatePath)) break;
-                Thread.Sleep(TimeSpan.FromSeconds(1));
-            }
-        }
+        var htmlTemplatePath = Path.Combine(buildRootPath, "index.html");
         
-        if (!File.Exists(htmlTemplatePath))
+        for (var i = 0; i < 5; i++)
         {
-            throw new FileNotFoundException("index.html does not exist.", htmlTemplatePath);
+            // Hack. We have a race condition where this method might be called when the file is recreated.
+            // This is OK when building the API and generating the Swagger.json, but not when running the application.
+            if (File.Exists(htmlTemplatePath)) break;
+            Thread.Sleep(TimeSpan.FromSeconds(1));
         }
-        
-        return File.ReadAllText(htmlTemplatePath, new UTF8Encoding());
+
+        return htmlTemplatePath;
     }
     
     private StringValues GetPermissionsPolicies()
